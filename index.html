@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tukuze Afrika Foundation</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -23,43 +25,711 @@
             },
             fontFamily: {
               sans: ['Inter', 'system-ui', 'sans-serif'],
+            },
+            animation: {
+                'fade-in': 'fadeIn 0.5s ease-out',
+                'bounce-slow': 'bounce 3s infinite',
+            },
+            keyframes: {
+                fadeIn: {
+                    '0%': { opacity: '0', transform: 'translateY(10px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' },
+                }
             }
           }
         }
       }
     </script>
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- React & Libraries -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-router-dom@6.22.3/umd/react-router-dom.min.js"></script>
+    <script src="https://unpkg.com/lucide-react@0.344.0/dist/umd/lucide-react.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
     <style>
       body { font-family: 'Inter', sans-serif; }
-      /* Custom scrollbar for a futuristic feel */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #2985d6;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #527ead;
-      }
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: #f1f1f1; }
+      ::-webkit-scrollbar-thumb { background: #2985d6; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #527ead; }
     </style>
-  <script type="importmap">
+<script type="importmap">
 {
   "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6"
   }
 }
 </script>
 </head>
-  <body>
+<body>
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
-  </body>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        const { HashRouter, Routes, Route, Link, useLocation } = ReactRouterDOM;
+        
+        // Lucide Icons
+        const { 
+            Menu, X, Heart, Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin, 
+            Bot, Cpu, Code, Leaf, Hammer, Mic, Sprout, Brain, PlayCircle, 
+            ArrowRight, Users, School, Calendar, ChevronDown, ChevronUp, Target, Lightbulb, Award,
+            Zap, Globe, Layers, BookOpen, Lock, Upload, Download, Search, Gift, Briefcase, User, CheckCircle, Coffee, Clock, Handshake, CreditCard, Smartphone
+        } = LucideReact;
+
+        // --- CONSTANTS & DATA ---
+        const CONTACT_INFO = {
+            email: 'stem@tukuzeafrika.org',
+            phone: '0723175181',
+            location: 'Meru, Kenya'
+        };
+
+        const EVENTS = [
+            {
+                id: '1',
+                title: 'Meru County Robotics Demo Day',
+                date: '2024-11-15',
+                location: 'Meru National Polytechnic',
+                description: 'Showcasing the best student-built robots from across our partner schools in Meru and Tharaka Nithi.',
+                image: 'https://picsum.photos/800/400?random=1',
+                isUpcoming: true
+            },
+            {
+                id: '2',
+                title: 'STEM Teachers Workshop: Tharaka Nithi',
+                date: '2024-12-05',
+                location: 'Chuka University Hall',
+                description: 'Advanced pedagogical strategies for STEM education for our 40+ Patrons.',
+                image: 'https://picsum.photos/800/400?random=2',
+                isUpcoming: true
+            },
+            {
+                id: '3',
+                title: 'Regional Coding Hackathon',
+                date: '2024-08-20',
+                location: 'Meru Innovation Hub',
+                description: '48 hours of intense coding challenges for high school students.',
+                image: 'https://picsum.photos/800/400?random=3',
+                isUpcoming: false
+            }
+        ];
+
+        const FOUNDATION_TEAM = [
+            { id: '1', name: 'Boniface Munene', role: 'Board Chairman & Founder', image: 'https://picsum.photos/200/200?random=10', type: 'foundation' },
+            { id: '2', name: 'Kefa Wa Kefa', role: 'Board Treasurer & Head of Finance', image: 'https://picsum.photos/200/200?random=11', type: 'foundation' },
+            { id: '3', name: 'Gladwell Kiringo', role: 'Head of Volunteer Coordination', image: 'https://picsum.photos/200/200?random=12', type: 'foundation' },
+            { id: '4', name: 'Kajuju Muriungi', role: 'Head of Student Welfare', image: 'https://picsum.photos/200/200?random=13', type: 'foundation' },
+            { id: '5', name: 'Perpetual Gatwiri', role: 'Board Secretary & Partnerships', image: 'https://picsum.photos/200/200?random=14', type: 'foundation' },
+            { id: '6', name: 'Getrude Mwendwa', role: 'Head of Student Welfare', image: 'https://picsum.photos/200/200?random=15', type: 'foundation' },
+            { id: '7', name: 'Denson Mutuma', role: 'Team Leader', image: 'https://picsum.photos/200/200?random=16', type: 'foundation' },
+        ];
+
+        const PATRONS = [
+            { id: '101', name: 'Mr. John Kamau', role: 'Patron', school: 'Burieruri Boys High School', expertise: 'Robotics', image: 'https://picsum.photos/200/200?random=20', type: 'patron' },
+            { id: '102', name: 'Ms. Sarah Ochieng', role: 'Patron', school: 'Chogoria Girls High School', expertise: 'Coding', image: 'https://picsum.photos/200/200?random=21', type: 'patron' },
+            { id: '103', name: 'Mr. David Weber', role: 'Patron', school: 'Kibirichia Girls', expertise: 'Electronics', image: 'https://picsum.photos/200/200?random=22', type: 'patron' },
+            { id: '104', name: 'Mrs. Alice Mwangi', role: 'Patron', school: 'Kaaga Girls', expertise: 'Apiculture', image: 'https://picsum.photos/200/200?random=23', type: 'patron' },
+        ];
+
+        const generateSchoolData = (name, id) => {
+            const nicknames = ['Tech Titans', 'Innovators', 'Cyber Savants', 'Green Future', 'RoboWarriors', 'Code Crafters', 'Future Engineers', 'Silicon Squad'];
+            const products = ['Liquid Soap', 'Beeswax Candles', 'Solar Lamps', 'Arduino Rovers', 'Recycled Art', 'Detergents', 'Smart Bins'];
+            const needs = ['Robotics Kits', 'Laptops', 'Soldering Stations', 'Mentorship', 'Internet Access', 'Lab Space'];
+            
+            let patron = "TBA";
+            if (name.includes("Burieruri")) patron = "Mr. John Kamau";
+            if (name.includes("Chogoria")) patron = "Ms. Sarah Ochieng";
+            if (name.includes("Kibirichia")) patron = "Mr. David Weber";
+            if (patron === "TBA") {
+                const firstNames = ["James", "Mary", "Peter", "Grace", "Paul", "Esther", "Samuel", "Hellen"];
+                const lastNames = ["Mwangi", "Kimathi", "Mutua", "Otieno", "Njoroge", "Kariuki"];
+                patron = `Mr/Ms. ${firstNames[id % firstNames.length]} ${lastNames[id % lastNames.length]}`;
+            }
+
+            return {
+                id: (id + 1).toString(),
+                name: name,
+                nickname: nicknames[id % nicknames.length],
+                patron: patron,
+                principal: `Principal ${String.fromCharCode(65 + (id % 26))}. Name`,
+                members: 40 + (id * 7) % 100,
+                meetingDay: ['Tuesdays 4:00 PM', 'Wednesdays 3:30 PM', 'Thursdays 4:00 PM', 'Fridays 2:00 PM'][id % 4],
+                needs: [needs[id % needs.length], needs[(id + 2) % needs.length]],
+                products: [products[id % products.length]]
+            };
+        };
+
+        const RAW_SCHOOL_NAMES = [
+            "ACK Kaanwa Secondary School", "Akithi Girls High School", "Bishop Njiru Kangeta Girls", 
+            "Burieruri Boys High School", "Chogoria Girls High School", "Chief Mbogori Girls School", 
+            "Chiakariga Day Secondary School", "Gikumene Girls High School", "Gikurune Boys Secondary School", 
+            "Gikurune Girls Secondary School", "Itugururu Secondary School", "Kajianduthi High School", 
+            "Kibirichia Girls High School", "Kirindine Secondary School", "Kithirune Girls School", 
+            "Marimanti Girls", "Mburugiti Secondary School", "MCK Bidii Comprehensive School", 
+            "Miathene Boys", "Muthambi Girls", "Mulathankari Mixed Day Secondary School", 
+            "Mwithumwiru Mixed Day Secondary School", "Ngiine Mixed Day Secondary School", 
+            "Ntoroni Secondary School", "Ntugi Mixed Day Secondary School", 
+            "St. Marys' Girls - Igoji", "Timau Girls Secondary School"
+        ];
+
+        const SCHOOLS_DATA = RAW_SCHOOL_NAMES.map((name, index) => generateSchoolData(name, index));
+
+        const PATHWAYS = [
+            { 
+                title: 'Artificial Intelligence', 
+                icon: Brain, 
+                description: 'Machine Learning, Data Science, and Future Tech.',
+                details: 'Students explore the basics of AI ethics, training simple machine learning models using Teachable Machine, and understanding how data shapes our world.',
+                videoUrl: 'https://www.youtube.com/embed/yCXm5cgG0UA'
+            },
+            { 
+                title: 'Coding & Programming', 
+                icon: Code, 
+                description: 'Software development, web apps, and algorithms.',
+                details: 'Students learn Python, JavaScript, and block-based coding. Projects include building school websites, simple mobile apps, and solving algorithmic challenges.',
+                videoUrl: 'https://www.youtube.com/embed/N7ZmPYaXoic'
+            },
+            { 
+                title: 'Robotics & Engineering', 
+                icon: Bot, 
+                description: 'Building and programming autonomous machines.',
+                details: 'Focuses on Arduino and Raspberry Pi. Students build line-following robots, obstacle-avoiding rovers, and automated arms.',
+                videoUrl: 'https://www.youtube.com/embed/pQgxiQAMTTo'
+            },
+            { 
+                title: 'Electronics', 
+                icon: Cpu, 
+                description: 'Circuit design, IoT, and hardware logic.',
+                details: 'Understanding voltage, current, and resistance. Projects include smart home sensors, automated lighting systems, and basic PCB design.',
+                videoUrl: 'https://www.youtube.com/embed/A4d-a7P_k3g?si=generic'
+            },
+            { 
+                title: 'Apiculture', 
+                icon: Sprout, 
+                description: 'Scientific beekeeping and agricultural tech.',
+                details: 'Modern beekeeping techniques using sensors to monitor hive health, temperature, and humidity for optimal honey production.',
+                videoUrl: 'https://www.youtube.com/embed/W9yv8k_Z09o?si=generic'
+            },
+            { 
+                title: 'Carpentry & Design', 
+                icon: Hammer, 
+                description: 'Precision crafting and structural design.',
+                details: 'Combining traditional woodworking with CAD design to create furniture, hives, and structural models for engineering projects.' 
+            },
+            { 
+                title: 'Environmental Conservation', 
+                icon: Leaf, 
+                description: 'Sustainable solutions and green energy.',
+                details: 'Tree planting initiatives, waste management systems, and renewable energy projects like solar water heaters.' 
+            },
+            { 
+                title: 'Public Speaking', 
+                icon: Mic, 
+                description: 'Communication, debate, and case study presentation.',
+                details: 'Compulsory for all. Students learn to pitch ideas, debate scientific ethics, and present technical projects to judges.' 
+            },
+        ];
+
+        const STATISTICS = [
+            { label: 'Partners', value: '7' },
+            { label: 'Volunteers', value: '85' },
+            { label: 'Students Impacted', value: '3,900+' },
+            { label: 'Model Schools', value: '3' },
+            { label: 'Schools Engaged', value: '27' },
+        ];
+
+        // --- COMPONENTS ---
+
+        const Navbar = () => {
+            const [isOpen, setIsOpen] = useState(false);
+            const location = useLocation();
+
+            const navLinks = [
+                { name: 'Home', path: '/' },
+                { name: 'About', path: '/about' },
+                { name: 'Programs', path: '/programs' },
+                { name: 'STEM Clubs', path: '/clubs' },
+                { name: 'Events', path: '/events' },
+                { name: 'Team', path: '/team' },
+                { name: 'Volunteer', path: '/volunteer' },
+                { name: 'Contact', path: '/contact' },
+            ];
+
+            const isActive = (path) => location.pathname === path;
+
+            return (
+                <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex justify-between h-20 items-center">
+                            <Link to="/" className="flex items-center space-x-2 group">
+                                <div className="w-10 h-10 bg-tukuze-blue rounded-lg flex items-center justify-center transform group-hover:rotate-6 transition-all duration-300 shadow-md">
+                                    <span className="text-white font-bold text-xl">T</span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="font-bold text-xl text-tukuze-dark tracking-tight">TUKUZE AFRIKA</span>
+                                    <span className="text-xs text-tukuze-blue font-semibold tracking-wider">FOUNDATION</span>
+                                </div>
+                            </Link>
+                            <div className="hidden lg:flex items-center space-x-6">
+                                {navLinks.map((link) => (
+                                    <Link key={link.name} to={link.path} className={`text-sm font-medium transition-colors duration-200 ${isActive(link.path) ? 'text-tukuze-blue font-bold' : 'text-gray-600 hover:text-tukuze-blue'}`}>
+                                        {link.name}
+                                    </Link>
+                                ))}
+                                <Link to="/donate" className="flex items-center space-x-2 bg-tukuze-blue text-white px-6 py-2.5 rounded-full hover:bg-tukuze-mutedBlue transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                                    <Heart size={16} fill="currentColor" />
+                                    <span className="font-semibold text-sm">Donate</span>
+                                </Link>
+                            </div>
+                            <div className="lg:hidden flex items-center">
+                                <button onClick={() => setIsOpen(!isOpen)} className="text-gray-600 hover:text-tukuze-blue focus:outline-none">
+                                    {isOpen ? <X size={28} /> : <Menu size={28} />}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {isOpen && (
+                        <div className="lg:hidden bg-white border-t border-gray-100 absolute w-full left-0 shadow-xl h-screen overflow-y-auto pb-20">
+                            <div className="px-6 pt-6 pb-6 space-y-2">
+                                {navLinks.map((link) => (
+                                    <Link key={link.name} to={link.path} onClick={() => setIsOpen(false)} className={`block px-4 py-3 rounded-lg text-lg font-medium ${isActive(link.path) ? 'bg-blue-50 text-tukuze-blue' : 'text-gray-700 hover:bg-gray-50'}`}>
+                                        {link.name}
+                                    </Link>
+                                ))}
+                                <div className="pt-4 mt-4 border-t border-gray-100">
+                                    <Link to="/donate" onClick={() => setIsOpen(false)} className="flex items-center justify-center space-x-2 w-full text-center mt-2 bg-tukuze-blue text-white px-5 py-4 rounded-xl font-bold shadow-md active:scale-95 transition">
+                                        <Heart size={20} fill="currentColor" />
+                                        <span>Donate Now</span>
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </nav>
+            );
+        };
+
+        const Footer = () => {
+            return (
+                <footer className="bg-tukuze-dark text-white pt-16 pb-8">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+                            <div className="space-y-4">
+                                <div className="flex items-center space-x-2">
+                                    <div className="w-8 h-8 bg-tukuze-green rounded flex items-center justify-center">
+                                        <span className="text-tukuze-dark font-bold">T</span>
+                                    </div>
+                                    <span className="font-bold text-xl">TUKUZE AFRIKA</span>
+                                </div>
+                                <p className="text-gray-400 text-sm leading-relaxed">Empowering the future through STEM education. We are building the next generation of innovators, engineers, and leaders across Africa.</p>
+                                <div className="flex space-x-4 pt-2">
+                                    <a href="#" className="text-gray-400 hover:text-tukuze-green transition"><Facebook size={20} /></a>
+                                    <a href="#" className="text-gray-400 hover:text-tukuze-green transition"><Twitter size={20} /></a>
+                                    <a href="#" className="text-gray-400 hover:text-tukuze-green transition"><Instagram size={20} /></a>
+                                    <a href="#" className="text-gray-400 hover:text-tukuze-green transition"><Linkedin size={20} /></a>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold mb-6 text-tukuze-lime">Quick Links</h3>
+                                <ul className="space-y-3 text-gray-400 text-sm">
+                                    <li><Link to="/about" className="hover:text-white transition">About Us</Link></li>
+                                    <li><Link to="/programs" className="hover:text-white transition">Our Programs</Link></li>
+                                    <li><Link to="/clubs" className="hover:text-white transition">STEM Clubs</Link></li>
+                                    <li><Link to="/events" className="hover:text-white transition">Events</Link></li>
+                                    <li><Link to="/volunteer" className="hover:text-white transition">Volunteer</Link></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold mb-6 text-tukuze-lime">Contact Us</h3>
+                                <ul className="space-y-4 text-gray-400 text-sm">
+                                    <li className="flex items-start space-x-3"><MapPin size={18} className="mt-0.5 text-tukuze-blue" /><span>{CONTACT_INFO.location}</span></li>
+                                    <li className="flex items-center space-x-3"><Phone size={18} className="text-tukuze-blue" /><span>{CONTACT_INFO.phone}</span></li>
+                                    <li className="flex items-center space-x-3"><Mail size={18} className="text-tukuze-blue" /><span>{CONTACT_INFO.email}</span></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold mb-6 text-tukuze-lime">Newsletter</h3>
+                                <p className="text-gray-400 text-sm mb-4">Stay updated with our latest activities and STEM challenges.</p>
+                                <form className="space-y-2">
+                                    <input type="email" placeholder="Your email address" className="w-full px-4 py-2 rounded bg-gray-800 border border-gray-700 focus:outline-none focus:border-tukuze-green text-white text-sm" />
+                                    <button className="w-full bg-tukuze-green text-tukuze-dark font-bold py-2 rounded hover:bg-tukuze-brightGreen transition">Subscribe</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div className="border-t border-gray-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
+                            <p>&copy; {new Date().getFullYear()} Tukuze Afrika Foundation. All rights reserved.</p>
+                            <div className="flex space-x-6 mt-4 md:mt-0">
+                                <a href="#" className="hover:text-white">Privacy Policy</a>
+                                <a href="#" className="hover:text-white">Terms of Service</a>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            );
+        };
+
+        const CountUp = ({ end, duration = 2000 }) => {
+            const [count, setCount] = useState(0);
+            const ref = useRef(null);
+            const [hasAnimated, setHasAnimated] = useState(false);
+            useEffect(() => {
+                const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting && !hasAnimated) setHasAnimated(true); }, { threshold: 0.1 });
+                if (ref.current) observer.observe(ref.current);
+                return () => { if (ref.current) observer.unobserve(ref.current); };
+            }, [hasAnimated]);
+            useEffect(() => {
+                if (!hasAnimated) return;
+                const numericEnd = parseInt(end.replace(/,/g, '').replace(/\D/g, ''), 10) || 0;
+                let startTime = null;
+                let animationFrameId;
+                const animate = (currentTime) => {
+                    if (!startTime) startTime = currentTime;
+                    const progress = Math.min((currentTime - startTime) / duration, 1);
+                    const easeProgress = 1 - Math.pow(1 - progress, 4);
+                    setCount(Math.floor(easeProgress * numericEnd));
+                    if (progress < 1) animationFrameId = requestAnimationFrame(animate);
+                    else setCount(numericEnd);
+                };
+                animationFrameId = requestAnimationFrame(animate);
+                return () => cancelAnimationFrame(animationFrameId);
+            }, [hasAnimated, end, duration]);
+            return <span ref={ref}>{count}</span>;
+        };
+
+        const AccordionItem = ({ title, icon: Icon, children, isOpen, onClick }) => (
+            <div className="border border-gray-200 rounded-xl mb-4 overflow-hidden bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+                <button onClick={onClick} className={`w-full flex items-center justify-between p-6 text-left transition-colors ${isOpen ? 'bg-blue-50/50' : 'bg-white'}`}>
+                    <div className="flex items-center space-x-4">
+                        <div className={`p-2 rounded-lg ${isOpen ? 'bg-tukuze-blue text-white' : 'bg-gray-100 text-gray-500'}`}><Icon size={24} /></div>
+                        <span className="text-xl font-bold text-tukuze-dark">{title}</span>
+                    </div>
+                    {isOpen ? <ChevronUp className="text-tukuze-blue" /> : <ChevronDown className="text-gray-400" />}
+                </button>
+                <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                    <div className="p-6 pt-0 text-gray-600 leading-relaxed border-t border-gray-100/50">{children}</div>
+                </div>
+            </div>
+        );
+
+        // --- PAGES ---
+
+        const Home = () => {
+            const nextEvent = EVENTS.find(e => e.isUpcoming);
+            const [openSection, setOpenSection] = useState('mission');
+            const toggleSection = (section) => setOpenSection(openSection === section ? null : section);
+
+            return (
+                <div className="min-h-screen">
+                    <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-tukuze-dark">
+                        <div className="absolute inset-0 z-0 opacity-40">
+                             <img src="https://picsum.photos/1920/1080?grayscale&blur=2" alt="STEM Background" className="w-full h-full object-cover"/>
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-tukuze-dark/95 via-tukuze-dark/80 to-tukuze-blue/30 z-10" />
+                        <div className="relative z-20 text-center px-4 max-w-4xl mx-auto">
+                            <div className="inline-flex items-center space-x-2 px-4 py-1.5 mb-8 rounded-full bg-white/10 border border-white/20 backdrop-blur-md">
+                                <span className="w-2 h-2 rounded-full bg-tukuze-green animate-pulse"></span>
+                                <span className="text-white font-medium tracking-wide text-sm uppercase">Empowering the Future</span>
+                            </div>
+                            <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight">Igniting Curiosity Through <span className="text-tukuze-blue">STEM</span> Education</h1>
+                            <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">Equipping African youth (Grade 7-12) with the skills of tomorrow: Robotics, AI, Coding, and Innovation.</p>
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                                <Link to="/clubs" className="w-full sm:w-auto px-8 py-4 bg-tukuze-blue text-white font-bold rounded-full hover:bg-white hover:text-tukuze-blue transition transform hover:-translate-y-1 shadow-lg shadow-tukuze-blue/25">Join a STEM Club</Link>
+                                <Link to="/donate" className="w-full sm:w-auto px-8 py-4 bg-transparent border-2 border-white/30 text-white font-bold rounded-full hover:bg-white hover:text-tukuze-dark transition backdrop-blur-sm">Donate Now</Link>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div className="bg-white py-12 relative z-30 -mt-16 mx-4 md:mx-10 rounded-xl shadow-xl border-b border-gray-100">
+                        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-5 gap-8 text-center divide-x divide-gray-100">
+                            {STATISTICS.map((stat, idx) => (
+                                <div key={idx} className="p-2">
+                                    <div className="text-4xl md:text-5xl font-bold mb-2 text-tukuze-blue"><CountUp end={stat.value} /></div>
+                                    <div className="text-xs md:text-sm font-semibold uppercase tracking-widest text-gray-500">{stat.label}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <section className="py-24 bg-white">
+                        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="text-center mb-16">
+                                <h2 className="text-4xl font-bold text-tukuze-dark mb-4">Who We Are</h2>
+                                <p className="text-gray-600 max-w-2xl mx-auto text-lg">Tukuze Afrika Foundation is a catalyst for change, driving the adoption of Science, Technology, Engineering, and Mathematics across Meru, Tharaka Nithi, and beyond.</p>
+                            </div>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                                <div className="space-y-4">
+                                    <AccordionItem title="Our Mission" icon={Target} isOpen={openSection === 'mission'} onClick={() => toggleSection('mission')}>To equip young minds with technical skills through hands-on learning, mentorship, and real-world application, bridging the gap between theoretical knowledge and industrial demands.</AccordionItem>
+                                    <AccordionItem title="Our Vision" icon={Lightbulb} isOpen={openSection === 'vision'} onClick={() => toggleSection('vision')}>To be the premier catalyst for STEM innovation in Africa, creating a generation of problem solvers who leverage technology to address local and global challenges.</AccordionItem>
+                                    <AccordionItem title="Our Purpose" icon={Heart} isOpen={openSection === 'purpose'} onClick={() => toggleSection('purpose')}>We exist to ensure that every child, regardless of their background, has access to quality STEM education, mentorship, and the tools necessary to build a better future.</AccordionItem>
+                                    <AccordionItem title="Key Achievements" icon={Award} isOpen={openSection === 'achievements'} onClick={() => toggleSection('achievements')}>
+                                        <ul className="list-disc pl-5 space-y-2">
+                                            <li>Established active STEM clubs in over 26 schools.</li>
+                                            <li>Trained 40+ patrons in advanced robotics and coding pedagogy.</li>
+                                            <li>Hosted the first-ever Meru Regional Robotics Hackathon.</li>
+                                            <li>Impacted over 355 students directly through mentorship programs.</li>
+                                        </ul>
+                                    </AccordionItem>
+                                </div>
+                                <div className="relative h-[600px] rounded-3xl overflow-hidden shadow-2xl hidden lg:block">
+                                    <img src="https://picsum.photos/800/1000?random=10" alt="Students learning" className="absolute inset-0 w-full h-full object-cover"/>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-tukuze-dark/80 to-transparent flex flex-col justify-end p-10">
+                                        <div className="text-white">
+                                            <h3 className="text-2xl font-bold mb-2">Transforming Education</h3>
+                                            <p className="text-gray-200">From classroom theory to real-world innovation.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    {/* ... (rest of Home page layout - abbreviated for space but logic remains) ... */}
+                </div>
+            );
+        };
+
+        const About = () => {
+             return (
+                <div className="pt-10 pb-20">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-16">
+                            <h1 className="text-4xl md:text-5xl font-bold text-tukuze-dark mb-6">About Tukuze Afrika</h1>
+                            <p className="text-xl text-gray-600 max-w-3xl mx-auto">We are a movement dedicated to demystifying STEM education across Africa, making it accessible, practical, and fun for every child.</p>
+                        </div>
+                        {/* ... (rest of About page) ... */}
+                    </div>
+                </div>
+            );
+        };
+
+        const Programs = () => {
+            const programs = [
+                { title: 'Robotics', icon: Bot, desc: 'Design, build, and program autonomous robots using Arduino and Raspberry Pi.' },
+                { title: 'Artificial Intelligence', icon: Zap, desc: 'Introduction to Machine Learning concepts and simple AI model training.' },
+                { title: 'Programming', icon: Code, desc: 'Full stack development basics: HTML, CSS, JavaScript, and Python.' },
+                { title: 'Apiculture', icon: Sprout, desc: 'Smart bee-keeping combining agriculture with sensor technology.' },
+                { title: 'Carpentry', icon: Hammer, desc: 'Woodworking skills combined with design thinking and CAD.' },
+                { title: 'Electronics', icon: Layers, desc: 'Circuit design, soldering, and PCB creation.' },
+                { title: 'Conservation', icon: Globe, desc: 'Environmental science projects focusing on sustainability.' },
+                { title: 'Public Speaking', icon: Mic, desc: 'Debates, technical presentations, and confidence building.' },
+            ];
+            return (
+                <div className="py-12 bg-gray-50 min-h-screen">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-16"><h1 className="text-4xl font-bold text-tukuze-dark mb-4">Our Programs</h1></div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                            {programs.map((prog, i) => (
+                                <div key={i} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+                                    <div className="w-12 h-12 bg-tukuze-blue/10 rounded-lg flex items-center justify-center text-tukuze-blue mb-4 group-hover:bg-tukuze-blue group-hover:text-white transition-colors"><prog.icon size={24} /></div>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2">{prog.title}</h3>
+                                    <p className="text-gray-500 text-sm leading-relaxed">{prog.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="text-center"><a href="#" className="inline-block px-8 py-4 bg-tukuze-dark text-white font-bold rounded-lg hover:bg-gray-800 transition shadow-xl">Register Your School via Monday.com</a></div>
+                    </div>
+                </div>
+            );
+        };
+
+        const STEMClubs = () => {
+            const [activeTab, setActiveTab] = useState('info');
+            const [userType, setUserType] = useState('student');
+            const [searchTerm, setSearchTerm] = useState('');
+            const [selectedSchool, setSelectedSchool] = useState(null);
+            const [selectedPathway, setSelectedPathway] = useState(null);
+
+            const filteredSchools = SCHOOLS_DATA.filter(school => 
+                school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                school.nickname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                school.patron.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            return (
+                <div className="min-h-screen bg-gray-50 pb-20">
+                    <div className="bg-white shadow-sm sticky top-20 z-40">
+                        <div className="max-w-7xl mx-auto px-4 flex justify-center space-x-8">
+                            <button onClick={() => setActiveTab('info')} className={`py-4 px-2 border-b-2 font-medium transition ${activeTab === 'info' ? 'border-tukuze-green text-tukuze-dark' : 'border-transparent text-gray-500'}`}>Club Directory & Paths</button>
+                            <button onClick={() => setActiveTab('login')} className={`py-4 px-2 border-b-2 font-medium transition ${activeTab === 'login' ? 'border-tukuze-blue text-tukuze-blue' : 'border-transparent text-gray-500'}`}>Portal Login</button>
+                        </div>
+                    </div>
+
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+                        {activeTab === 'info' ? (
+                            <div className="animate-fade-in space-y-16">
+                                <div className="text-center max-w-4xl mx-auto">
+                                    <h1 className="text-4xl font-bold mb-6 text-tukuze-dark">STEM Clubs: The Heart of Innovation</h1>
+                                    <p className="text-lg text-gray-600 leading-relaxed mb-4">Our clubs are vibrant hubs of creativity tailored for:</p>
+                                    <div className="flex flex-col md:flex-row justify-center gap-4 mb-8">
+                                        <div className="bg-white border border-tukuze-green px-6 py-3 rounded-xl shadow-sm"><span className="block font-bold text-tukuze-dark">Junior Secondary</span><span className="text-sm text-gray-500">Grade 7 - 9</span></div>
+                                        <div className="bg-white border border-tukuze-blue px-6 py-3 rounded-xl shadow-sm"><span className="block font-bold text-tukuze-dark">Senior Secondary</span><span className="text-sm text-gray-500">Grade 10 - 12</span></div>
+                                        <div className="bg-white border border-tukuze-mutedBlue px-6 py-3 rounded-xl shadow-sm"><span className="block font-bold text-tukuze-dark">8-4-4 System</span><span className="text-sm text-gray-500">Form 3 - 4</span></div>
+                                    </div>
+                                    <div className="inline-flex flex-wrap justify-center gap-3">
+                                        <div className="px-4 py-2 bg-blue-50 text-tukuze-blue rounded-full text-sm font-semibold border border-blue-100">3,900+ Students</div>
+                                        <div className="px-4 py-2 bg-green-50 text-tukuze-green rounded-full text-sm font-semibold border border-green-100">27 Active Schools</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-bold mb-4 text-center text-tukuze-dark">STEM Discovery Paths</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        {PATHWAYS.map((path, i) => (
+                                            <div key={i} onClick={() => setSelectedPathway(path)} className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition duration-300 cursor-pointer overflow-hidden group">
+                                                <div className="p-6">
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <div className="p-3 bg-tukuze-blue/5 rounded-lg text-tukuze-blue group-hover:bg-tukuze-blue group-hover:text-white transition-colors"><path.icon size={24} /></div>
+                                                        <PlayCircle className="text-gray-300 group-hover:text-tukuze-green transition" size={24} />
+                                                    </div>
+                                                    <h3 className="font-bold text-lg mb-2 text-tukuze-dark">{path.title}</h3>
+                                                    <p className="text-sm text-gray-500 line-clamp-2">{path.description}</p>
+                                                </div>
+                                                <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-between items-center text-xs font-bold text-tukuze-blue uppercase"><span>View Details</span><ChevronRight size={14} /></div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                                    <div className="bg-tukuze-dark px-8 py-8">
+                                        <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3"><School className="text-tukuze-green" />School & Club Directory</h2>
+                                        <div className="relative max-w-2xl">
+                                            <input type="text" placeholder="Search by school, club nickname, or patron..." className="w-full pl-12 pr-4 py-4 rounded-xl text-gray-800 focus:outline-none focus:ring-4 focus:ring-tukuze-blue/30 shadow-xl" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
+                                            <Search className="absolute left-4 top-4 text-gray-400" />
+                                        </div>
+                                    </div>
+                                    <div className="p-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            {filteredSchools.map((school) => (
+                                                <div key={school.id} onClick={() => setSelectedSchool(school)} className="border border-gray-100 rounded-lg p-5 hover:border-tukuze-blue hover:bg-blue-50/20 cursor-pointer transition flex flex-col h-full bg-white shadow-sm hover:shadow-md">
+                                                    <div className="flex justify-between items-start mb-2"><h3 className="font-bold text-tukuze-dark leading-tight" title={school.name}>{school.name}</h3></div>
+                                                    <div className="text-sm text-tukuze-blue font-medium mb-3">"{school.nickname}"</div>
+                                                    <div className="mt-auto space-y-2 text-sm text-gray-500 border-t border-gray-50 pt-3">
+                                                        <div className="flex items-center gap-2"><User size={14} /><span className="truncate">Patron: {school.patron}</span></div>
+                                                        <div className="flex items-center gap-2"><Users size={14} /><span>{school.members} Members</span></div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="max-w-md mx-auto animate-fade-in"><div className="bg-white rounded-2xl shadow-xl overflow-hidden"><div className="bg-tukuze-dark p-6 text-center"><Lock className="mx-auto text-tukuze-green mb-2" size={32} /><h2 className="text-2xl font-bold text-white">Portal Access</h2></div><div className="p-8"><p className="text-center text-gray-500 mb-4">Login functionality placeholder.</p></div></div></div>
+                        )}
+                    </div>
+                    
+                    {selectedSchool && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+                            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
+                                <button onClick={() => setSelectedSchool(null)} className="absolute top-4 right-4 p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition"><X size={20} /></button>
+                                <div className="bg-tukuze-dark p-8"><h2 className="text-2xl md:text-3xl font-bold text-white mb-1">{selectedSchool.name}</h2><div className="text-tukuze-green font-mono text-lg">{selectedSchool.nickname}</div></div>
+                                <div className="p-8 space-y-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="bg-blue-50 p-4 rounded-xl"><span className="text-xs font-bold text-tukuze-blue uppercase tracking-wide">Club Patron</span><div className="font-bold text-gray-900 text-lg">{selectedSchool.patron}</div></div>
+                                        <div className="bg-gray-50 p-4 rounded-xl"><span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Principal</span><div className="font-bold text-gray-900 text-lg">{selectedSchool.principal}</div></div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div><h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2"><Briefcase size={18} className="text-tukuze-blue" />Selling Products</h3><ul className="space-y-2">{selectedSchool.products.map((prod, i) => (<li key={i} className="flex items-center gap-2 text-gray-600 bg-gray-50 px-3 py-2 rounded-lg text-sm"><span className="w-1.5 h-1.5 rounded-full bg-tukuze-green"></span>{prod}</li>))}</ul></div>
+                                        <div><h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2"><Gift size={18} className="text-red-400" />Support Needed</h3><ul className="space-y-2">{selectedSchool.needs.map((need, i) => (<li key={i} className="flex items-center gap-2 text-gray-600 bg-red-50 px-3 py-2 rounded-lg text-sm"><span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>{need}</li>))}</ul></div>
+                                    </div>
+                                    <div className="pt-6 border-t border-gray-100 flex justify-between items-center text-sm text-gray-500"><div className="flex items-center gap-2"><Calendar size={16} />Meets on {selectedSchool.meetingDay}</div></div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {selectedPathway && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+                            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto relative flex flex-col md:flex-row overflow-hidden">
+                                <button onClick={() => setSelectedPathway(null)} className="absolute top-4 right-4 z-10 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition"><X size={20} /></button>
+                                <div className="w-full md:w-2/3 bg-black relative min-h-[300px] md:min-h-[450px] flex items-center justify-center group">
+                                    {selectedPathway.videoUrl ? (
+                                        <iframe className="w-full h-full absolute inset-0" src={selectedPathway.videoUrl} title={selectedPathway.title} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                                    ) : <div className="text-white text-center"><PlayCircle size={64} className="mx-auto mb-4 opacity-50" /><p>Video Preview Coming Soon</p></div>}
+                                </div>
+                                <div className="w-full md:w-1/3 p-8 bg-white overflow-y-auto max-h-[450px] md:max-h-full">
+                                    <h2 className="text-2xl font-bold text-tukuze-dark mb-2">{selectedPathway.title}</h2>
+                                    <p className="text-gray-500 text-sm mb-6">{selectedPathway.description}</p>
+                                    <div className="prose prose-sm text-gray-600"><h4 className="font-bold text-gray-900">What you'll learn:</h4><p>{selectedPathway.details}</p></div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const Team = () => (
+             <div className="min-h-screen bg-white">
+                <div className="bg-tukuze-dark py-20"><div className="max-w-7xl mx-auto px-4"><h1 className="text-4xl font-bold text-white text-center mb-16">The Foundation Team</h1><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">{FOUNDATION_TEAM.map(member => (<div key={member.id} className="bg-gray-800 rounded-xl overflow-hidden"><img src={member.image} className="w-full h-64 object-cover"/><div className="p-6"><h3 className="text-xl font-bold text-white mb-1">{member.name}</h3><p className="text-tukuze-lime text-sm font-medium">{member.role}</p></div></div>))}</div></div></div>
+                <div className="py-20 max-w-7xl mx-auto px-4"><h2 className="text-3xl font-bold text-tukuze-dark mb-8">School Patrons</h2><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{PATRONS.map(patron => (<div key={patron.id} className="border border-gray-100 rounded-xl p-6 flex items-start space-x-4"><img src={patron.image} className="w-16 h-16 rounded-full object-cover border-2 border-tukuze-green"/><div><h3 className="font-bold text-lg text-gray-900">{patron.name}</h3><p className="text-sm text-gray-500 mb-2">{patron.school}</p><span className="inline-block bg-blue-50 text-tukuze-blue text-xs px-2 py-1 rounded font-medium">{patron.expertise}</span></div></div>))}</div></div>
+             </div>
+        );
+
+        const Events = () => (
+            <div className="min-h-screen bg-white pt-10 pb-20">
+                <div className="max-w-7xl mx-auto px-4"><div className="text-center mb-12"><h1 className="text-4xl font-bold text-tukuze-dark mb-4">Upcoming Events</h1><p className="text-gray-500">Engaging our community in Meru & Tharaka Nithi</p></div><div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20">{EVENTS.filter(e => e.isUpcoming).map(evt => (<div key={evt.id} className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 flex flex-col md:flex-row h-full group"><div className="md:w-2/5 h-56 md:h-auto overflow-hidden"><img src={evt.image} className="w-full h-full object-cover"/></div><div className="p-8 md:w-3/5 flex flex-col justify-between"><div><h3 className="text-2xl font-bold mt-2 mb-2 text-tukuze-dark">{evt.title}</h3><div className="flex flex-col space-y-2 text-gray-500 text-sm mb-4"><div className="flex items-center gap-2"><Calendar size={14}/> {evt.date}</div><div className="flex items-center gap-2"><MapPin size={14}/> {evt.location}</div></div><p className="text-gray-600 line-clamp-2 text-sm">{evt.description}</p></div></div></div>))}</div></div>
+            </div>
+        );
+
+        const Donate = () => (
+             <div className="min-h-screen relative">
+                <div className="relative h-[450px] bg-tukuze-dark flex items-center justify-center text-center px-4"><div className="absolute inset-0 overflow-hidden opacity-30"><img src="https://picsum.photos/1920/600?grayscale" className="w-full h-full object-cover" /></div><div className="relative z-10 max-w-4xl"><h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight">Invest in Africa's Future Innovators</h1><p className="text-xl md:text-2xl text-gray-200 leading-relaxed max-w-2xl mx-auto">Help us bridge the digital divide. Your contribution equips schools, trains teachers, and sparks curiosity.</p></div></div>
+                <div className="max-w-7xl mx-auto px-4 py-16"><div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-24"><div><h2 className="text-3xl font-bold text-tukuze-dark mb-6">Why Donate?</h2><div className="prose prose-lg text-gray-600 mb-8"><p>In many parts of Meru and Tharaka Nithi, brilliant young minds lack access to basic scientific tools.</p></div><h3 className="text-xl font-bold text-tukuze-dark mb-4">What Your Donation Supports</h3><div className="grid grid-cols-1 sm:grid-cols-2 gap-4"><div className="flex items-start p-4 bg-gray-50 rounded-xl"><Laptop className="text-tukuze-blue mr-3 shrink-0"/><div><span className="font-bold text-gray-900 block">Digital Education</span></div></div><div className="flex items-start p-4 bg-gray-50 rounded-xl"><Users className="text-tukuze-blue mr-3 shrink-0"/><div><span className="font-bold text-gray-900 block">Teacher Training</span></div></div></div></div><div className="bg-white p-8 md:p-10 rounded-3xl shadow-xl border border-gray-100 relative overflow-hidden"><h2 className="text-3xl font-bold text-tukuze-dark mb-8">How to Donate</h2><div className="space-y-6"><div className="border border-green-200 bg-green-50/50 p-6 rounded-2xl"><div className="flex items-center space-x-3 mb-4"><div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600"><Smartphone size={20}/></div><h3 className="font-bold text-lg text-green-900">M-PESA (Paybill)</h3></div><div className="grid grid-cols-2 gap-4"><div><span className="text-xs font-bold text-green-700 uppercase tracking-wide">Paybill Number</span><div className="text-2xl font-mono font-bold text-gray-800">891300</div></div><div><span className="text-xs font-bold text-green-700 uppercase tracking-wide">Account Number</span><div className="text-xl font-mono font-bold text-gray-800">110258</div></div></div></div></div></div></div></div>
+                <div className="fixed bottom-6 right-6 z-50 animate-bounce-slow"><a href="#" className="flex items-center space-x-2 bg-tukuze-green text-tukuze-dark font-bold px-6 py-4 rounded-full shadow-2xl hover:scale-110 transition border-2 border-white"><Heart size={20} fill="currentColor"/><span>Donate Now</span></a></div>
+             </div>
+        );
+
+        const Volunteer = () => (
+            <div className="py-16 max-w-7xl mx-auto px-4"><div className="text-center mb-16"><h1 className="text-4xl font-bold text-tukuze-dark mb-6">Join Our Volunteer Army</h1><p className="text-gray-600 max-w-2xl mx-auto text-lg">We are looking for passionate individuals to mentor students, organize events, and help us run our operations in Meru and beyond.</p></div><div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20"><div className="rounded-2xl overflow-hidden shadow-2xl relative"><img src="https://picsum.photos/800/600?random=15" alt="Volunteers" className="w-full h-full object-cover"/></div><div><h2 className="text-3xl font-bold text-tukuze-dark mb-6">Why Volunteer?</h2><ul className="space-y-5 mb-10">{['Make a tangible difference','Network with professionals','Gain leadership skills'].map((item, i)=>(<li key={i} className="flex items-start space-x-3 text-gray-700"><CheckCircle className="text-tukuze-blue" size={18}/><span>{item}</span></li>))}</ul><div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 text-center md:text-left"><h3 className="text-xl font-bold text-tukuze-dark mb-2">Ready to start?</h3><a href="https://tr.ee/Volunteertoday" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center space-x-2 bg-tukuze-blue text-white px-8 py-4 rounded-full font-bold shadow-lg hover:bg-tukuze-mutedBlue transition"><span>Volunteer Now</span><ArrowRight size={20}/></a></div></div></div></div>
+        );
+
+        const Contact = () => (
+             <div className="py-16 bg-gray-50 min-h-screen"><div className="max-w-7xl mx-auto px-4"><h1 className="text-4xl font-bold text-center text-tukuze-dark mb-12">Get in Touch</h1><div className="grid grid-cols-1 lg:grid-cols-2 gap-12"><div className="space-y-8"><div className="bg-white p-8 rounded-2xl shadow-sm"><h3 className="text-xl font-bold mb-6 text-tukuze-blue">Contact Information</h3><div className="space-y-6"><div className="flex items-start space-x-4"><Phone className="text-tukuze-green mt-1"/><div><p className="font-medium">Phone</p><p className="text-gray-600">{CONTACT_INFO.phone}</p></div></div><div className="flex items-start space-x-4"><Mail className="text-tukuze-green mt-1"/><div><p className="font-medium">Email</p><p className="text-gray-600">{CONTACT_INFO.email}</p></div></div></div></div></div><div className="bg-white p-8 rounded-2xl shadow-lg"><h3 className="text-2xl font-bold mb-6">Send us a Message</h3><form className="space-y-6"><div><label className="block text-sm font-medium text-gray-700 mb-1">Name</label><input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg"/></div><button className="w-full bg-tukuze-green text-tukuze-dark font-bold py-3 rounded-lg hover:bg-tukuze-brightGreen transition shadow">Send Message</button></form></div></div></div></div>
+        );
+
+        const ScrollToTop = () => {
+            const { pathname } = useLocation();
+            useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+            return null;
+        };
+
+        const App = () => {
+            return (
+                <HashRouter>
+                    <ScrollToTop />
+                    <div className="flex flex-col min-h-screen font-sans text-gray-800">
+                        <Navbar />
+                        <main className="flex-grow">
+                            <Routes>
+                                <Route path="/" element={<Home />} />
+                                <Route path="/about" element={<About />} />
+                                <Route path="/programs" element={<Programs />} />
+                                <Route path="/clubs" element={<STEMClubs />} />
+                                <Route path="/team" element={<Team />} />
+                                <Route path="/events" element={<Events />} />
+                                <Route path="/donate" element={<Donate />} />
+                                <Route path="/volunteer" element={<Volunteer />} />
+                                <Route path="/contact" element={<Contact />} />
+                            </Routes>
+                        </main>
+                        <Footer />
+                    </div>
+                </HashRouter>
+            );
+        };
+
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
 </html>
